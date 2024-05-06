@@ -3,6 +3,7 @@
 
 #define ROWS 20
 #define COLUMNS 10
+#define FIG_SIZE 4
 
 typedef struct {
   int **field;
@@ -26,7 +27,7 @@ typedef enum {
 } UserAction_t;
 
 void userInput(UserAction_t action, int hold);
-// GameInfo_t updateCurrentState();
+GameInfo_t updateCurrentState();
 
 GameInfo_t *getInfo();
 

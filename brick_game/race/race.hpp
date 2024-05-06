@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#include "common.h"
+#include "../../common.h"
 
 const int MAX_ENEMIES = 2;
 const int ENEMY_STEP = 14;
@@ -33,7 +33,10 @@ struct RaceState_t {
   int numberOfEnemy;
   bool gameOver;
   UserAction_t action;
+  StateStatus stateStatus;
 };
+
+enum StateStatus { START, SPAWN, SHIFT, STEP, END };
 
 class Race {
  public:
@@ -62,6 +65,5 @@ class Race {
 
 Race* getRace();
 void copyField(int** from, int** to);
-GameInfo_t updateCurrentState();
 
 #endif  // S21_RACE_H

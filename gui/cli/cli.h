@@ -4,9 +4,9 @@
 #include <ncurses.h>
 #include <stdio.h>
 
-#include "../common.h"
+#include "../../common.h"
 
-void printField(GameInfo_t info);
+void draw(GameInfo_t info);
 void printGameOver();
 UserAction_t getPressedKey();
 void print_main_field(GameInfo_t *info);

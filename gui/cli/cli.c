@@ -1,6 +1,6 @@
 #include "cli.h"
 
-void printField(GameInfo_t info) {
+void draw(GameInfo_t info) {
   clear();
   printw("\nSCORE: %d\t\tLEVEL:%d\n", info.score, info.level);
   printw("HIGH SCORE: %d\n\n", info.high_score);
