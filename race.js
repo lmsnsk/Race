@@ -62,8 +62,8 @@ class Race {
   gameOver;
 
   shift(direction) {
-    if (direction === Left && x > 0) x--;
-    else if (direction === Right && x < COLUMNS - 3) x++;
+    if (direction === Left && this.x > 0) this.x -= 1;
+    else if (direction === Right && this.x < COLUMNS - 3) this.x += 1;
   }
 
   initField() {
@@ -147,7 +147,7 @@ class Race {
 }
 
 const race = new Race();
-const a = 19;
+const a = 22;
 for (let i = 0; i < a; i++) race.step();
 race.updateField();
 
