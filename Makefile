@@ -24,7 +24,7 @@ else
 	OPEN_CMD=xdg-open
 endif
 
-all: race_cli
+all: clean race_cli
 
 snake: install
 	./app/Snake.app
@@ -64,6 +64,9 @@ asan_s: $(SNAKE_LIB)
 
 asan_t: $(TETRIS_LIB)
 	$(CC) $(FLAGS) -DTETRIS $(ASAN) $(TETRIS_FILES) $(FLAGCUR)
+
+asan_r: $(RACE_LIB)
+	$(CC) $(FLAGS) -DRACE $(ASAN) $(RACE_FILES) $(FLAGCUR)
 
 install:
 	mkdir ./build

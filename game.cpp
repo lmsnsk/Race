@@ -12,9 +12,9 @@ int main(void) {
   initInfoField(info);
   updateCurrentState();
 
-  while (1) {
-    timeout(400);  // speed
+  while (info->level != -1) {
     gameLoop();
+    timeout(info->speed);
   }
 
   clearInfo(info);
@@ -29,7 +29,6 @@ void setup() {
   cbreak();
   keypad(stdscr, true);
   curs_set(false);
-  timeout(100);  // speed
 }
 
 void initInfoField(GameInfo_t *info) {

@@ -1,56 +1,81 @@
 #include "fsm_race.hpp"
 
-void gameLoop(UserAction_t &status) {
+void gameLoop() {
+  UserAction_t status = Down;
   Race *race = getRace();
   GameInfo_t *info = getInfo();
+  StateStatus &stateStatus = race->getState()->stateStatus;
 
-  if (race->getState()->stateStatus == START) {
-    ;
-  }
-  if (race->getState()->stateStatus == SPAWN) {
-    spawnEnemy();
-  }
-  if (race->getState()->stateStatus == SHIFT) {
-    ;
-  }
-  if (race->getState()->stateStatus == STEP) {
-    ;
-  }
-  if (race->getState()->stateStatus == END) {
-    ;
-  }
-
-  status = getPressedKey();
-  race->step();
   race->updateField();
-  updateCurrentState();
-  draw(*info);
+  if (race->getState()->gameOver) stateStatus = GAME_OVER;
+
+  if (stateStatus == START) {
+    startGame(status, stateStatus);
+  }
+
+  if (stateStatus == SPAWN) {
+    race->spawnEnemy();
+    stateStatus = SHIFT;
+  }
+
+  if (stateStatus == SHIFT) {
+    shiftCar(status, stateStatus);
+  }
+
+  if (stateStatus == PAUSE) {
+    status = getPressedKey();
+    if (status == Terminate) race->getState()->level = -1;
+    if (status == Pause) race->getState()->pause = 0;
+    stateStatus = SHIFT;
+  }
+
+  if (stateStatus == STEP) {
+    race->step();
+    updateCurrentState();
+    draw(*info);
+  }
+
+  if (stateStatus == GAME_OVER) {
+    status = getPressedKey();
+    if (status == Terminate) race->getState()->level = -1;
+    if (!race->getState()->gameOver) draw(*info);
+    updateCurrentState();
+  }
 };
+
+void startGame(UserAction_t &status, StateStatus &stateStatus) {
+  Race *race = getRace();
+  GameInfo_t *info = getInfo();
+  draw(*info);
+  status = getPressedKey();
+  if (status == Start) stateStatus = SPAWN;
+  if (status == Terminate) race->getState()->level = -1;
+}
+
+void shiftCar(UserAction_t &status, StateStatus &stateStatus) {
+  Race *race = getRace();
+  GameInfo_t *info = getInfo();
+  int &pause = race->getState()->pause;
+  status = getPressedKey();
+  userInput(status, 0);
+  race->getState()->stateStatus = pause ? PAUSE : STEP;
+  if ((status == Right || status == Left) && !race->getState()->pause) {
+    race->shift(status);
+    updateCurrentState();
+    draw(*info);
+  }
+  if (status == Terminate) race->getState()->level = -1;
+  if (status == Pause) {
+    pause = !pause;
+    stateStatus = PAUSE;
+  }
+  status = Down;
+}
 
 GameInfo_t updateCurrentState() {
   GameInfo_t *info = getInfo();
   Race *race = getRace();
   RaceState_t *state = race->getState();
-  // UserAction_t action = state->action;
-
-  // if (action == Start && !state->start) {
-  //   state->start = 1;
-  // } else if (action == Pause) {
-  //   state->pause = !state->pause;
-  // } else if (!state->pause && state->start) {
-  //   if (action == Left) {
-  //     state->moveSnake(state, s21::LEFT);
-  //   } else if (action == Right) {
-  //     state->moveSnake(state, s21::RIGHT);
-  //   } else if (action == Up) {
-  //     state->moveSnake(state, s21::UP);
-  //   } else if (action == Down) {
-  //     state->moveSnake(state, s21::DOWN);
-  //   } else {
-  //     state->moveSnake(state, state->direction);
-  //   }
-  // }
-
   copyField(state->field, info->field);
   info->high_score = state->high_score;
   info->pause = state->pause;
@@ -58,4 +83,25 @@ GameInfo_t updateCurrentState() {
   info->speed = state->speed;
   info->level = state->level;
   return *info;
+};
+
+void userInput(UserAction_t action, int hold) {
+  Race *race = getRace();
+  (void)hold;
+  if (action == Pause)
+    race->getState()->action = Pause;
+  else if (action == Start)
+    race->getState()->action = Start;
+  else if (action == Up)
+    race->getState()->action = Up;
+  else if (action == Down)
+    race->getState()->action = Down;
+  else if (action == Left)
+    race->getState()->action = Left;
+  else if (action == Right)
+    race->getState()->action = Right;
+  else if (action == Terminate)
+    race->getState()->action = Terminate;
+  else if (action == Action)
+    race->getState()->action = Action;
 };

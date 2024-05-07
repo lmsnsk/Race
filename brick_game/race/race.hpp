@@ -1,8 +1,11 @@
 #ifndef S21_RACE_H
 #define S21_RACE_H
 
+#include <chrono>
+#include <fstream>
 #include <iostream>
 #include <random>
+#include <thread>
 #include <vector>
 
 #include "../../common.h"
@@ -15,6 +18,8 @@ struct Coord_t {
   int x;
   int y;
 };
+
+enum StateStatus { START, PAUSE, SPAWN, SHIFT, STEP, GAME_OVER };
 
 struct RaceState_t {
   int** field;
@@ -35,8 +40,6 @@ struct RaceState_t {
   UserAction_t action;
   StateStatus stateStatus;
 };
-
-enum StateStatus { START, SPAWN, SHIFT, STEP, END };
 
 class Race {
  public:

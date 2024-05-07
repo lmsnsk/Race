@@ -3,8 +3,11 @@
 Race::Race() {
   state.gameOver = false;
   state.enemyNum = 0;
-  state.gameCounter = 0;
-  state.numberOfEnemy = 0;
+  state.gameCounter = 1;
+  state.numberOfEnemy = 1;
+  state.stateStatus = START;
+  state.level = 1;
+  state.speed = 500;
   initCar();
   initializeField();
   fillField();
@@ -53,7 +56,7 @@ void Race::initCar() {
   state.car[3][0] = 0;
   state.car[3][2] = 0;
   state.x = 3;
-  state.y = 1;
+  state.y = 0;
 };
 
 void Race::initEnemyCar() {
@@ -90,12 +93,13 @@ void Race::spawnEnemy() {
 };
 
 void Race::step() {
+  state.stateStatus = SHIFT;
   for (int i = 0; i < state.numberOfEnemy; i++) {
     if (state.enemeis[i].y < ROWS + 1) state.enemeis[i].y += 1;
   }
-  if (state.gameCounter % ENEMY_STEP == 0 || state.gameCounter == 0) {
+  if (state.gameCounter % ENEMY_STEP == 0) {
     if (state.numberOfEnemy < MAX_ENEMIES) state.numberOfEnemy += 1;
-    spawnEnemy();
+    state.stateStatus = SPAWN;
   }
   state.gameCounter += 1;
 };
@@ -132,26 +136,6 @@ void Race::updateField() {
 };
 
 RaceState_t *Race::getState() { return &state; };
-
-// int main() {
-//   Race race;
-//   int a = 22;
-//   for (int i = 0; i < a; i++) race.step();
-//   race.updateField();
-
-//   if (!race.state.gameOver) {
-//     for (int i = 0; i < ROWS; i++) {
-//       for (int j = 0; j < COLUMNS; j++) {
-//         std::cout << race.state.field[i][j];
-//         std::cout << " ";
-//       }
-//       std::cout << std::endl;
-//     }
-//   } else {
-//     std::cout << "GAME OVER" << std::endl;
-//   }
-//   return 0;
-// }
 
 Race *getRace() {
   static Race race;
