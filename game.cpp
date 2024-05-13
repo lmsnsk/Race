@@ -1,5 +1,5 @@
 #include "common.h"
-#include "fsm/fsm_race.hpp"
+#include "fms/fms_race.hpp"
 
 void setup();
 void initInfoField(GameInfo_t *info);

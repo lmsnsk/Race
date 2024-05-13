@@ -7,12 +7,14 @@ Race::Race() {
   state.numberOfEnemy = 1;
   state.stateStatus = START;
   state.level = 1;
-  state.speed = 500;
+  state.speed = 200;
+  state.first_step = 0;
   initCar();
   initializeField();
   fillField();
   updateCar();
   initEnemyCar();
+  readHighScore();
 }
 
 Race::~Race() { clearField(); };
@@ -22,6 +24,7 @@ void Race::shift(UserAction_t direction) {
     state.x -= 1;
   else if (direction == Right && state.x < COLUMNS - 3)
     state.x += 1;
+  updateField();
 };
 
 void Race::initializeField() {
@@ -78,6 +81,22 @@ void Race::initEnemyCar() {
   }
 };
 
+void Race::readHighScore() {
+  std::ifstream file("race_score.txt");
+  if (file.is_open()) {
+    file >> state.high_score;
+    file.close();
+  }
+};
+
+void Race::saveHighScore() {
+  std::ofstream file("race_score.txt");
+  if (file.is_open()) {
+    file << state.score;
+    file.close();
+  }
+};
+
 int Race::getRandomInt(int min, int max) {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -90,9 +109,20 @@ void Race::spawnEnemy() {
   state.enemeis[state.enemyNum] = {random, -5};
   state.enemyNum =
       (state.enemyNum == MAX_ENEMIES - 1) ? 0 : (state.enemyNum + 1);
+  changeScore();
+};
+
+void Race::changeScore() {
+  state.score += 1;
+  if (state.score > state.high_score) saveHighScore();
+  if (state.score % 15 == 0 && state.level <= 10) {
+    state.level += 1;
+    state.speed -= state.speed * 0.1;
+  }
 };
 
 void Race::step() {
+  if (!state.first_step) state.first_step = 1;
   state.stateStatus = SHIFT;
   for (int i = 0; i < state.numberOfEnemy; i++) {
     if (state.enemeis[i].y < ROWS + 1) state.enemeis[i].y += 1;

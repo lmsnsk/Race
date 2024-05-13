@@ -7,7 +7,7 @@ TETRIS_LIB=tetris.a
 RACE_LIB=race.a
 SNAKE_FILES=controller/controller.cpp $(SNAKE_LIB) gui/cli/cli.c
 TETRIS_FILES=controller/controller.cpp $(TETRIS_LIB) gui/cli/cli.c
-RACE_FILES=game.cpp fsm/fsm_race.cpp $(RACE_LIB) gui/cli/cli.c
+RACE_FILES=game.cpp fms/fms_race.cpp $(RACE_LIB) gui/cli/cli.c
 FILETEST=tests/*.cpp controller/controller.cpp brick_game/snake/*.cpp
 FILEREPORT=s21_test_report
 FILETESTO=s21_test
@@ -24,7 +24,7 @@ else
 	OPEN_CMD=xdg-open
 endif
 
-all: clean race_cli
+all: race_cli
 
 snake: install
 	./app/Snake.app

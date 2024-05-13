@@ -32,6 +32,7 @@ struct RaceState_t {
   int level;
   int speed;
   int pause;
+  int first_step;
   int x;
   int y;
   int gameCounter;
@@ -62,6 +63,9 @@ class Race {
   void updateCar();
   void checkCollision(int i, int j, int k);
   void updateField();
+  void readHighScore();
+  void saveHighScore();
+  void changeScore();
 
  private:
 };

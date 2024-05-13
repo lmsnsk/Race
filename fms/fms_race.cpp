@@ -1,4 +1,4 @@
-#include "fsm_race.hpp"
+#include "fms_race.hpp"
 
 void gameLoop() {
   UserAction_t status = Down;
@@ -49,22 +49,26 @@ void startGame(UserAction_t &status, StateStatus &stateStatus) {
   draw(*info);
   status = getPressedKey();
   if (status == Start) stateStatus = SPAWN;
-  if (status == Terminate) race->getState()->level = -1;
+  if (status == Terminate) {
+    race->getState()->level = -1;
+    updateCurrentState();
+  }
 }
 
 void shiftCar(UserAction_t &status, StateStatus &stateStatus) {
   Race *race = getRace();
   GameInfo_t *info = getInfo();
-  int &pause = race->getState()->pause;
-  status = getPressedKey();
+  RaceState_t *state = race->getState();
+  int &pause = state->pause;
+  status = state->first_step ? getPressedKey() : Down;
   userInput(status, 0);
-  race->getState()->stateStatus = pause ? PAUSE : STEP;
-  if ((status == Right || status == Left) && !race->getState()->pause) {
+  state->stateStatus = pause ? PAUSE : STEP;
+  if (!state->pause && (status == Right || status == Left)) {
     race->shift(status);
     updateCurrentState();
     draw(*info);
   }
-  if (status == Terminate) race->getState()->level = -1;
+  if (status == Terminate) state->level = -1;
   if (status == Pause) {
     pause = !pause;
     stateStatus = PAUSE;
