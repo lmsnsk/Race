@@ -105,54 +105,61 @@ class Race {
   }
 
   initCar(): void {
-    this.car[0] = [CELL, CELL, CELL];
-    this.car[1] = [0, CELL, 0];
-    this.car[2] = [CELL, CELL, CELL];
-    this.car[3] = [0, CELL, 0];
-    this.x = 3;
-    this.y = 1;
+    this.state.car[0] = [CELL, CELL, CELL];
+    this.state.car[1] = [0, CELL, 0];
+    this.state.car[2] = [CELL, CELL, CELL];
+    this.state.car[3] = [0, CELL, 0];
+    this.state.x = 3;
+    this.state.y = 1;
   }
 
   initEnemyCar(): void {
-    this.enemy[0] = [0, ECELL, 0];
-    this.enemy[1] = [ECELL, ECELL, ECELL];
-    this.enemy[2] = [0, ECELL, 0];
-    this.enemy[3] = [ECELL, ECELL, ECELL];
-    this.enemy[4] = [0, ECELL, 0];
+    this.state.enemy[0] = [0, ECELL, 0];
+    this.state.enemy[1] = [ECELL, ECELL, ECELL];
+    this.state.enemy[2] = [0, ECELL, 0];
+    this.state.enemy[3] = [ECELL, ECELL, ECELL];
+    this.state.enemy[4] = [0, ECELL, 0];
     for (let i = 0; i < MAX_ENEMIES; i++) {
-      this.enemeis[i] = { x: 0, y: -5 };
+      this.state.enemeis[i] = { x: 0, y: -5 };
     }
   }
 
   spawnEnemy(): void {
     let random: number = Math.round(Math.random() * (COLUMNS - 3));
-    this.enemeis[this.enemyNum] = { x: random, y: -5 };
-    this.enemyNum = this.enemyNum === MAX_ENEMIES - 1 ? 0 : this.enemyNum + 1;
+    this.state.enemeis[this.state.enemyNum] = { x: random, y: -5 };
+    this.state.enemyNum =
+      this.state.enemyNum === MAX_ENEMIES - 1 ? 0 : this.state.enemyNum + 1;
   }
 
   step(): void {
-    for (let i = 0; i < this.numberOfEnemy; i++) {
-      if (this.enemeis[i].y < ROWS + 1) this.enemeis[i].y += 1;
+    for (let i = 0; i < this.state.numberOfEnemy; i++) {
+      if (this.state.enemeis[i].y < ROWS + 1) this.state.enemeis[i].y += 1;
     }
-    if (this.gameCounter % ENEMY_STEP === 0 || this.gameCounter === 0) {
-      if (this.numberOfEnemy < MAX_ENEMIES) this.numberOfEnemy += 1;
+    if (
+      this.state.gameCounter % ENEMY_STEP === 0 ||
+      this.state.gameCounter === 0
+    ) {
+      if (this.state.numberOfEnemy < MAX_ENEMIES) this.state.numberOfEnemy += 1;
       this.spawnEnemy();
     }
-    this.gameCounter += 1;
+    this.state.gameCounter += 1;
   }
 
   updateCar(): void {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
-        if (this.car[i][j] === CELL)
-          this.state[ROWS - i - this.y - 1][j + this.x] = CELL;
+        if (this.state.car[i][j] === CELL)
+          this.state[ROWS - i - this.state.y - 1][j + this.state.x] = CELL;
       }
     }
   }
 
   checkCollision(i: number, j: number, k: number): void {
-    if (this.state[i + this.enemeis[k].y][j + this.enemeis[k].x] === CELL) {
-      this.gameOver = true;
+    if (
+      this.state[i + this.state.enemeis[k].y][j + this.state.enemeis[k].x] ===
+      CELL
+    ) {
+      this.state.gameOver = true;
     }
   }
 
@@ -161,12 +168,14 @@ class Race {
       for (let i = 0; i < 5; i++) {
         for (let j = 0; j < 3; j++) {
           if (
-            this.enemy[i][j] === ECELL &&
-            i + this.enemeis[k].y < ROWS &&
-            i + this.enemeis[k].y >= 0
+            this.state.enemy[i][j] === ECELL &&
+            i + this.state.enemeis[k].y < ROWS &&
+            i + this.state.enemeis[k].y >= 0
           ) {
             this.checkCollision(i, j, k);
-            this.state[i + this.enemeis[k].y][j + this.enemeis[k].x] = ECELL;
+            this.state[i + this.state.enemeis[k].y][
+              j + this.state.enemeis[k].x
+            ] = ECELL;
           }
         }
       }
@@ -179,7 +188,7 @@ const a = 22;
 for (let i = 0; i < a; i++) race.step();
 race.updateField();
 
-if (!race.gameOver) {
+if (!race.state.gameOver) {
   for (let i = 0; i < ROWS; i++) {
     let out: string = "null";
     for (let j = 0; j < COLUMNS; j++) {
