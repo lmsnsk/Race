@@ -9,6 +9,15 @@ enum UserAction_t {
   Action,
 }
 
+enum StateStatus_t {
+  START,
+  PAUSE,
+  SPAWN,
+  SHIFT,
+  STEP,
+  GAME_OVER,
+}
+
 const ROWS = 20;
 const COLUMNS = 10;
 const CELL = 1;
@@ -21,7 +30,7 @@ interface Coord_t {
   y: number;
 }
 
-class GameInfo_t {
+interface GameInfo_t {
   field: Array<Array<number>>;
   next: Array<Array<number>>;
   score: number;
@@ -31,53 +40,68 @@ class GameInfo_t {
   pause: number;
 }
 
-class GameState_t {
+interface RaceState_t {
   field: Array<Array<number>>;
-  next: Array<Array<number>>;
+  car: Array<Array<number>>;
+  enemy: Array<Array<number>>;
+  enemeis: Array<Coord_t>;
   score: number;
   high_score: number;
   level: number;
   speed: number;
   pause: number;
+  enemyNum: number;
+  firstStep: number;
+  x: number;
+  y: number;
+  gameCounter: number;
+  numberOfEnemy: number;
+  gameOver: boolean;
+  action: UserAction_t;
+  stateStatus: StateStatus_t;
 }
 
 class Race {
   constructor() {
-    this.gameOver = false;
-    this.enemyNum = 0;
-    this.gameCounter = 0;
-    this.numberOfEnemy = 0;
+    this.state.gameOver = false;
+    this.state.enemyNum = 0;
+    this.state.gameCounter = 0;
+    this.state.numberOfEnemy = 0;
+    this.state.stateStatus = 0;
     this.initCar();
-    this.initField();
+    this.initializeField();
     this.initEnemyCar();
   }
 
-  car: Array<Array<number>> = Array(4);
-  enemy: Array<Array<number>> = Array(5);
-  state: Array<Array<number>> = Array(ROWS);
-  enemeis: Array<Coord_t> = Array(3);
-  enemyNum: number;
-  x: number;
-  y: number;
-  status: UserAction_t;
-  gameCounter: number;
-  numberOfEnemy: number;
-  gameOver: boolean;
+  state: RaceState_t;
+
+  // car: Array<Array<number>> = Array(4);
+  // enemy: Array<Array<number>> = Array(5);
+  // state: Array<Array<number>> = Array(ROWS);
+  // enemeis: Array<Coord_t> = Array(3);
+  // enemyNum: number;
+  // x: number;
+  // y: number;
+  // status: UserAction_t;
+  // gameCounter: number;
+  // numberOfEnemy: number;
+  // gameOver: boolean;
 
   shift(direction: UserAction_t): void {
-    if (direction === UserAction_t.Left && this.x > 0) this.x -= 1;
-    else if (direction === UserAction_t.Right && this.x < COLUMNS - 3)
-      this.x += 1;
+    if (direction === UserAction_t.Left && this.state.x > 0) {
+      this.state.x -= 1;
+    } else if (direction === UserAction_t.Right && this.state.x < COLUMNS - 3) {
+      this.state.x += 1;
+    }
   }
 
-  initField(): void {
+  initializeField(): void {
     for (let i = 0; i < ROWS; i++) {
       this.state[i] = Array(COLUMNS);
       for (let j = 0; j < COLUMNS; j++) {
         this.state[i][j] = 0;
       }
     }
-    this.updateCar();
   }
 
   initCar(): void {

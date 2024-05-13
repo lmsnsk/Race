@@ -25,8 +25,8 @@ struct RaceState_t {
   int** field;
   int car[4][3];
   int enemy[5][3];
-  int score;
   std::vector<Coord_t> enemeis;
+  int score;
   int high_score;
   int enemyNum;
   int level;
