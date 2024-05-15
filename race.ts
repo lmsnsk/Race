@@ -1,3 +1,5 @@
+// const fs = require("node:fs/promises");
+
 enum UserAction_t {
   Start,
   Pause,
@@ -63,14 +65,30 @@ interface RaceState_t {
 
 class Race {
   constructor() {
-    this.state.gameOver = false;
-    this.state.enemyNum = 0;
-    this.state.gameCounter = 0;
-    this.state.numberOfEnemy = 0;
-    this.state.stateStatus = 0;
+    this.state = {
+      field: [[]],
+      car: [],
+      enemy: [],
+      enemeis: [],
+      score: 0,
+      high_score: 0,
+      level: 1,
+      speed: 200,
+      pause: 0,
+      x: 3,
+      y: 0,
+      firstStep: 0,
+      enemyNum: 0,
+      gameOver: false,
+      gameCounter: 0,
+      numberOfEnemy: 0,
+      action: 0,
+      stateStatus: 0,
+    };
     this.initCar();
-    this.initializeField();
+    this.fillField();
     this.initEnemyCar();
+    // this.readHighScore();
   }
 
   state: RaceState_t;
@@ -93,13 +111,14 @@ class Race {
     } else if (direction === UserAction_t.Right && this.state.x < COLUMNS - 3) {
       this.state.x += 1;
     }
+    this.updateField();
   }
 
-  initializeField(): void {
+  fillField(): void {
     for (let i = 0; i < ROWS; i++) {
-      this.state[i] = Array(COLUMNS);
+      this.state.field[i] = Array(COLUMNS);
       for (let j = 0; j < COLUMNS; j++) {
-        this.state[i][j] = 0;
+        this.state.field[i][j] = 0;
       }
     }
   }
@@ -110,7 +129,7 @@ class Race {
     this.state.car[2] = [CELL, CELL, CELL];
     this.state.car[3] = [0, CELL, 0];
     this.state.x = 3;
-    this.state.y = 1;
+    this.state.y = 0;
   }
 
   initEnemyCar(): void {
@@ -129,16 +148,25 @@ class Race {
     this.state.enemeis[this.state.enemyNum] = { x: random, y: -5 };
     this.state.enemyNum =
       this.state.enemyNum === MAX_ENEMIES - 1 ? 0 : this.state.enemyNum + 1;
+    // this.changeScore();
+  }
+
+  changeScore(): void {
+    this.state.score += 1;
+    if (this.state.score > this.state.high_score) {
+      // this.saveHighScore();
+    }
+    if (this.state.score % 15 == 0 && this.state.level <= 10) {
+      this.state.level += 1;
+      this.state.speed -= this.state.speed * 0.1;
+    }
   }
 
   step(): void {
     for (let i = 0; i < this.state.numberOfEnemy; i++) {
       if (this.state.enemeis[i].y < ROWS + 1) this.state.enemeis[i].y += 1;
     }
-    if (
-      this.state.gameCounter % ENEMY_STEP === 0 ||
-      this.state.gameCounter === 0
-    ) {
+    if (this.state.gameCounter % ENEMY_STEP === 0) {
       if (this.state.numberOfEnemy < MAX_ENEMIES) this.state.numberOfEnemy += 1;
       this.spawnEnemy();
     }
@@ -149,21 +177,25 @@ class Race {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         if (this.state.car[i][j] === CELL)
-          this.state[ROWS - i - this.state.y - 1][j + this.state.x] = CELL;
+          this.state.field[ROWS - i - this.state.y - 1][j + this.state.x] =
+            CELL;
       }
     }
   }
 
   checkCollision(i: number, j: number, k: number): void {
     if (
-      this.state[i + this.state.enemeis[k].y][j + this.state.enemeis[k].x] ===
-      CELL
+      this.state.field[i + this.state.enemeis[k].y][
+        j + this.state.enemeis[k].x
+      ] === CELL
     ) {
       this.state.gameOver = true;
     }
   }
 
   updateField(): void {
+    this.fillField();
+    this.updateCar();
     for (let k = 0; k < MAX_ENEMIES; k++) {
       for (let i = 0; i < 5; i++) {
         for (let j = 0; j < 3; j++) {
@@ -173,7 +205,7 @@ class Race {
             i + this.state.enemeis[k].y >= 0
           ) {
             this.checkCollision(i, j, k);
-            this.state[i + this.state.enemeis[k].y][
+            this.state.field[i + this.state.enemeis[k].y][
               j + this.state.enemeis[k].x
             ] = ECELL;
           }
@@ -181,10 +213,12 @@ class Race {
       }
     }
   }
+
+  // end
 }
 
 const race = new Race();
-const a = 22;
+const a = 16;
 for (let i = 0; i < a; i++) race.step();
 race.updateField();
 
@@ -192,8 +226,8 @@ if (!race.state.gameOver) {
   for (let i = 0; i < ROWS; i++) {
     let out: string = "null";
     for (let j = 0; j < COLUMNS; j++) {
-      if (out === "null") out = race.state[i][j] + " ";
-      else out += race.state[i][j] + " ";
+      if (out === "null") out = race.state.field[i][j] + " ";
+      else out += race.state.field[i][j] + " ";
     }
     console.log(out);
   }
