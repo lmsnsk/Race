@@ -1,4 +1,4 @@
-// const fs = require("node:fs/promises");
+const fs = require("fs");
 
 enum UserAction_t {
   Start,
@@ -88,7 +88,7 @@ class Race {
     this.initCar();
     this.fillField();
     this.initEnemyCar();
-    // this.readHighScore();
+    this.readHighScore();
   }
 
   state: RaceState_t;
@@ -143,18 +143,43 @@ class Race {
     }
   }
 
+  readHighScore() {
+    const filePath = "race_score.txt";
+    fs.open(filePath, "r", (err: any, fd: number) => {
+      if (err) {
+        if (err.code === "ENOENT") {
+          console.error("File does not exist");
+          return;
+        }
+        throw err;
+      }
+      try {
+        console.log(fd);
+        this.state.high_score = fd;
+      } finally {
+        fs.close(fd, (err: any) => {
+          if (err) throw err;
+        });
+      }
+    });
+  }
+
+  saveHighScore() {
+    fs.writeFileSync("race_score.txt", this.state.score.toString());
+  }
+
   spawnEnemy(): void {
     let random: number = Math.round(Math.random() * (COLUMNS - 3));
     this.state.enemeis[this.state.enemyNum] = { x: random, y: -5 };
     this.state.enemyNum =
       this.state.enemyNum === MAX_ENEMIES - 1 ? 0 : this.state.enemyNum + 1;
-    // this.changeScore();
+    this.changeScore();
   }
 
   changeScore(): void {
     this.state.score += 1;
     if (this.state.score > this.state.high_score) {
-      // this.saveHighScore();
+      this.saveHighScore();
     }
     if (this.state.score % 15 == 0 && this.state.level <= 10) {
       this.state.level += 1;
@@ -217,20 +242,25 @@ class Race {
   // end
 }
 
-const race = new Race();
-const a = 16;
-for (let i = 0; i < a; i++) race.step();
-race.updateField();
+// const data = fs.readFileSync("1.txt");
+// console.log(data.toString());
+// data.then(console.log());
 
-if (!race.state.gameOver) {
-  for (let i = 0; i < ROWS; i++) {
-    let out: string = "null";
-    for (let j = 0; j < COLUMNS; j++) {
-      if (out === "null") out = race.state.field[i][j] + " ";
-      else out += race.state.field[i][j] + " ";
-    }
-    console.log(out);
-  }
-} else {
-  console.log("GAME OVER");
-}
+const race = new Race();
+console.log(race.state.high_score);
+// const a = 16;
+// for (let i = 0; i < a; i++) race.step();
+// race.updateField();
+
+// if (!race.state.gameOver) {
+//   for (let i = 0; i < ROWS; i++) {
+//     let out: string = "null";
+//     for (let j = 0; j < COLUMNS; j++) {
+//       if (out === "null") out = race.state.field[i][j] + " ";
+//       else out += race.state.field[i][j] + " ";
+//     }
+//     console.log(out);
+//   }
+// } else {
+//   console.log("GAME OVER");
+// }
