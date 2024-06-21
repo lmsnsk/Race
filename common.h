@@ -28,7 +28,6 @@ typedef enum {
 
 void userInput(UserAction_t action, int hold);
 GameInfo_t updateCurrentState();
-
 GameInfo_t *getInfo();
 
 #endif  // S21_COMMON_H
