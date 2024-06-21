@@ -29,14 +29,18 @@ header {
 }
 
 .field {
-  display: flex;
-  align-items: start;
-  flex-wrap: wrap;
   width: 250px;
   height: 500px;
   border: 2px solid rgb(63, 63, 63);
   box-sizing: content-box;
   background-color: rgb(255, 255, 255);
+}
+
+.field-helper {
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+  box-sizing: content-box;
 }
 
 .cell {
@@ -54,6 +58,10 @@ header {
   font-weight: 500;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
+}
+
+.info div {
+  width: 200px;
 }
 
 .info p {

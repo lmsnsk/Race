@@ -1,5 +1,6 @@
 {
   "name": "race",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "server/app.js",
@@ -10,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
   }
 }
