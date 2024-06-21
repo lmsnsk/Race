@@ -5,6 +5,20 @@ const levelField = document.querySelector("#level");
 
 const host = "http://localhost:3000/";
 
+let gameSpeed;
+let intervalId;
+
+const intervalFn = async () => {
+  const data = await getData("ArrowUp");
+  draw(data);
+
+  if (intervalId && gameSpeed !== data.speed) {
+    clearInterval(intervalId);
+    intervalId = setInterval(intervalFn, data.speed);
+  }
+  gameSpeed = data.speed;
+};
+
 const getData = async (cmd) => {
   try {
     const response = await fetch(host, {
@@ -32,33 +46,35 @@ const pressKeyHandler = async (event) => {
     event.key === "p" ||
     event.key === "P"
   ) {
-    draw(await getData(event.key));
+    const data = await getData(event.key);
+    draw(data);
+    if (!intervalId) {
+      intervalId = setInterval(intervalFn, data.speed);
+      gameSpeed = data.speed;
+    }
   }
 };
 
-const intervalFn = async () => {
-  draw(await getData("ArrowUp"));
-};
-
 const draw = (data) => {
-  const isWillRemove = document.querySelector(".field-helper");
-  if (isWillRemove) isWillRemove.remove();
-
-  const fieldHelper = document.createElement("div");
-  fieldHelper.className = "field-helper";
-  field.append(fieldHelper);
+  let cell = document.querySelector(".cell");
+  let temp = field.firstChild;
 
   data.field.forEach((line) => {
     line.forEach((element) => {
-      const cell = document.createElement("div");
+      if (!cell || !cell.nextElementSibling) {
+        cell = document.createElement("div");
+        field.append(cell);
+      } else {
+        cell = temp;
+        temp = cell.nextElementSibling;
+      }
       cell.className = `cell${element ? " full-cell" : ""}`;
-      fieldHelper.append(cell);
     });
   });
+
   scoreField.innerText = `Score: ${data.score}`;
   highScoreField.innerText = `High score: ${data.high_score}`;
   levelField.innerText = `Level: ${data.level}`;
 };
 
 document.addEventListener("keydown", pressKeyHandler);
-// setInterval(intervalFn, 200);

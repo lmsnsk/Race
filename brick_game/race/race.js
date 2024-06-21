@@ -1,9 +1,8 @@
 // const fs = require("fs");
 
+const CELL = 1;
 const ROWS = 20;
 const COLUMNS = 10;
-const CELL = 1;
-const ECELL = 1;
 const MAX_ENEMIES = 2;
 const ENEMY_STEP = 14;
 
@@ -18,16 +17,15 @@ class Race {
       high_score: 0,
       level: 1,
       speed: 200,
-      pause: 0,
+      pause: false,
       x: 3,
       y: 0,
-      firstStep: 0,
+      firstStep: false,
       enemyNum: 0,
       gameOver: false,
       gameCounter: 0,
       numberOfEnemy: 0,
-      action: 0,
-      stateStatus: 0,
+      action: -1,
     };
     this.initCar();
     this.fillField();
@@ -38,9 +36,9 @@ class Race {
   state;
 
   shift(direction) {
-    if (direction === UserAction_t.Left && this.state.x > 0) {
+    if (direction === "<" && this.state.x > 0) {
       this.state.x -= 1;
-    } else if (direction === UserAction_t.Right && this.state.x < COLUMNS - 3) {
+    } else if (direction === ">" && this.state.x < COLUMNS - 3) {
       this.state.x += 1;
     }
     this.updateField();
@@ -65,11 +63,11 @@ class Race {
   }
 
   initEnemyCar() {
-    this.state.enemy[0] = [0, ECELL, 0];
-    this.state.enemy[1] = [ECELL, ECELL, ECELL];
-    this.state.enemy[2] = [0, ECELL, 0];
-    this.state.enemy[3] = [ECELL, ECELL, ECELL];
-    this.state.enemy[4] = [0, ECELL, 0];
+    this.state.enemy[0] = [0, CELL, 0];
+    this.state.enemy[1] = [CELL, CELL, CELL];
+    this.state.enemy[2] = [0, CELL, 0];
+    this.state.enemy[3] = [CELL, CELL, CELL];
+    this.state.enemy[4] = [0, CELL, 0];
     for (let i = 0; i < MAX_ENEMIES; i++) {
       this.state.enemeis[i] = { x: 0, y: -5 };
     }
@@ -105,15 +103,15 @@ class Race {
     this.state.enemeis[this.state.enemyNum] = { x: random, y: -5 };
     this.state.enemyNum =
       this.state.enemyNum === MAX_ENEMIES - 1 ? 0 : this.state.enemyNum + 1;
-    // this.changeScore();
+    this.changeScore();
   }
 
   changeScore() {
     this.state.score += 1;
     if (this.state.score > this.state.high_score) {
-      this.saveHighScore();
+      //   this.saveHighScore();
     }
-    if (this.state.score % 15 == 0 && this.state.level <= 10) {
+    if (this.state.score % 15 == 0 && this.state.level < 10) {
       this.state.level += 1;
       this.state.speed -= this.state.speed * 0.1;
     }
@@ -126,14 +124,14 @@ class Race {
       for (let i = 0; i < 5; i++) {
         for (let j = 0; j < 3; j++) {
           if (
-            this.state.enemy[i][j] === ECELL &&
+            this.state.enemy[i][j] === CELL &&
             i + this.state.enemeis[k].y < ROWS &&
             i + this.state.enemeis[k].y >= 0
           ) {
             this.checkCollision(i, j, k);
             this.state.field[i + this.state.enemeis[k].y][
               j + this.state.enemeis[k].x
-            ] = ECELL;
+            ] = CELL;
           }
         }
       }

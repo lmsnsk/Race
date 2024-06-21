@@ -32,11 +32,7 @@ header {
   width: 250px;
   height: 500px;
   border: 2px solid rgb(63, 63, 63);
-  box-sizing: content-box;
   background-color: rgb(255, 255, 255);
-}
-
-.field-helper {
   display: flex;
   align-items: start;
   flex-wrap: wrap;
