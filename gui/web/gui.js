@@ -8,17 +8,6 @@ const host = "http://localhost:3000/";
 let gameSpeed;
 let intervalId;
 
-const intervalFn = async () => {
-  const data = await getData("ArrowUp");
-  draw(data);
-
-  if (intervalId && gameSpeed !== data.speed) {
-    clearInterval(intervalId);
-    intervalId = setInterval(intervalFn, data.speed);
-  }
-  gameSpeed = data.speed;
-};
-
 const getData = async (cmd) => {
   try {
     const response = await fetch(host, {
@@ -30,6 +19,30 @@ const getData = async (cmd) => {
   } catch (er) {
     console.error(er);
   }
+};
+
+const intervalFn = async () => {
+  const data = await getData("ArrowUp");
+  draw(data);
+
+  if (intervalId && gameSpeed !== data.speed) {
+    clearInterval(intervalId);
+    intervalId = setInterval(intervalFn, data.speed);
+  }
+  if (
+    intervalId &&
+    data.level === -1 &&
+    !document.querySelector(".game-over-msg")
+  ) {
+    clearInterval(intervalId);
+    drawGameOver();
+    intervalId = 0;
+  }
+  if (data.pause && !document.querySelector(".pause-msg") && data.level >= 0) {
+    drawPause();
+  }
+
+  gameSpeed = data.speed;
 };
 
 const pressKeyHandler = async (event) => {
@@ -47,8 +60,32 @@ const pressKeyHandler = async (event) => {
     event.key === "P"
   ) {
     const data = await getData(event.key);
+
+    if (
+      event.key === "e" ||
+      event.key === "E" ||
+      event.key === "q" ||
+      event.key === "Q"
+    ) {
+      if (event.key === "e" || event.key === "E") {
+        let isStarted = document.querySelector(".start-msg");
+        if (isStarted) isStarted.remove();
+      }
+      let isGameOver = document.querySelector(".game-over-msg");
+      if (isGameOver) isGameOver.remove();
+    }
+    if (event.key === "p" || event.key === "P") {
+      let isPaused = document.querySelector(".pause-msg");
+      if (isPaused) isPaused.remove();
+    }
+
     draw(data);
-    if (!intervalId) {
+
+    if (event.key === "q" || event.key === "Q") {
+      restart();
+    }
+
+    if (!intervalId && event.key !== "p" && event.key !== "P") {
       intervalId = setInterval(intervalFn, data.speed);
       gameSpeed = data.speed;
     }
@@ -74,7 +111,42 @@ const draw = (data) => {
 
   scoreField.innerText = `Score: ${data.score}`;
   highScoreField.innerText = `High score: ${data.high_score}`;
-  levelField.innerText = `Level: ${data.level}`;
+  if (data.level >= 0) levelField.innerText = `Level: ${data.level}`;
 };
 
+function drawGameOver() {
+  const gameOverMsg = document.createElement("div");
+  field.append(gameOverMsg);
+  gameOverMsg.className = "msg game-over-msg";
+  gameOverMsg.innerText = "GAME OVER Press E to restart";
+}
+
+function restart() {
+  if (!document.querySelector(".start-msg")) {
+    const startMsg = document.createElement("div");
+    field.append(startMsg);
+    startMsg.className = "msg start-msg";
+    startMsg.innerText = "Press E to start game";
+  }
+  let isPaused = document.querySelector(".pause-msg");
+  if (isPaused) isPaused.remove();
+}
+
+function drawPause() {
+  const pauseMsg = document.createElement("div");
+  field.append(pauseMsg);
+  pauseMsg.className = "msg pause-msg";
+  pauseMsg.innerText = "PAUSE";
+}
+
+const setStartValues = async () => {
+  const data = await getData("");
+  highScoreField.innerText = `High score: ${data.high_score}`;
+  const startMsg = document.createElement("div");
+  field.append(startMsg);
+  startMsg.className = "msg start-msg";
+  startMsg.innerText = "Press E to start game";
+};
+
+setStartValues();
 document.addEventListener("keydown", pressKeyHandler);

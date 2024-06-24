@@ -29,6 +29,7 @@ header {
 }
 
 .field {
+  position: relative;
   width: 250px;
   height: 500px;
   border: 2px solid rgb(63, 63, 63);
@@ -37,6 +38,7 @@ header {
   align-items: start;
   flex-wrap: wrap;
   box-sizing: content-box;
+  box-shadow: 0 0 5px;
 }
 
 .cell {
@@ -58,9 +60,38 @@ header {
 
 .info div {
   width: 200px;
+  margin-bottom: 5px;
 }
 
 .info p {
   display: inline;
   margin-right: 10px;
+}
+
+.msg {
+  position: absolute;
+  width: 150px;
+  padding: 5px;
+  left: 50px;
+  top: 225px;
+  background-color: rgb(209, 209, 209);
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: 500;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 10px;
+}
+
+.game-over-msg {
+  color: red;
+}
+
+.pause-msg {
+  color: blue;
+}
+
+.start-msg {
+  color: green;
 }

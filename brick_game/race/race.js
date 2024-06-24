@@ -1,4 +1,4 @@
-// const fs = require("fs");
+import { readFileSync, writeFileSync } from "fs";
 
 const CELL = 1;
 const ROWS = 20;
@@ -26,11 +26,12 @@ class Race {
       gameCounter: 0,
       numberOfEnemy: 0,
       action: -1,
+      filename: "brick_game/race/race_score.txt",
     };
     this.initCar();
     this.fillField();
     this.initEnemyCar();
-    // this.readHighScore();
+    this.readHighScore();
   }
 
   state;
@@ -74,28 +75,17 @@ class Race {
   }
 
   readHighScore() {
-    const filePath = "race_score.txt";
-    fs.open(filePath, "r", (err, fd) => {
-      if (err) {
-        if (err.code === "ENOENT") {
-          console.error("File does not exist");
-          return;
-        }
-        throw err;
-      }
-      try {
-        console.log(fd);
-        this.state.high_score = fd;
-      } finally {
-        fs.close(fd, (err) => {
-          if (err) throw err;
-        });
-      }
-    });
+    try {
+      this.state.high_score = +readFileSync(this.state.filename);
+    } catch (er) {
+      this.state.high_score = 0;
+    }
   }
 
   saveHighScore() {
-    fs.writeFileSync("race_score.txt", this.state.score.toString());
+    if (this.state.score > this.state.high_score) {
+      writeFileSync(this.state.filename, this.state.score.toString());
+    }
   }
 
   spawnEnemy() {
@@ -109,11 +99,11 @@ class Race {
   changeScore() {
     this.state.score += 1;
     if (this.state.score > this.state.high_score) {
-      //   this.saveHighScore();
+      this.saveHighScore();
     }
     if (this.state.score % 15 == 0 && this.state.level < 10) {
       this.state.level += 1;
-      this.state.speed -= this.state.speed * 0.1;
+      this.state.speed -= this.state.speed * 0.15;
     }
   }
 
@@ -169,8 +159,6 @@ class Race {
       this.state.gameOver = true;
     }
   }
-
-  // end
 }
 
 export default Race;

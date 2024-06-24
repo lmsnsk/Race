@@ -13,7 +13,6 @@ const actionEnum = {
 };
 Object.freeze(actionEnum);
 
-///////////////
 export function gameLoop(action) {
   userInput(action);
 
@@ -28,10 +27,12 @@ export function gameLoop(action) {
   } else if (race.state.action === actionEnum.STEP) {
     step();
   }
+  if (race.state.action === actionEnum.GAME_OVER) {
+    gameOver();
+  }
 
   return updateCurrentState();
 }
-///////////////
 
 function userInput(action) {
   switch (action) {
@@ -85,24 +86,32 @@ function updateCurrentState() {
 
 function startGame() {
   race.state.firstStep = true;
+  race.state.level = 1;
 }
 
 function shift(action) {
   if (race.state.pause || !race.state.firstStep) return;
   race.shift(action === "ArrowRight" ? ">" : "<");
+  if (race.state.gameOver) race.state.action = actionEnum.GAME_OVER;
 }
 
 function step() {
   if (race.state.pause || !race.state.firstStep) return;
   race.step();
+  if (race.state.gameOver) race.state.action = actionEnum.GAME_OVER;
 }
 
 function pause() {
-  if (race.state.action === actionEnum.PAUSE) {
+  if (race.state.action === actionEnum.PAUSE && race.state.firstStep === true) {
     race.state.pause = !race.state.pause;
   }
 }
 
 function terminate() {
   race = new Race();
+}
+
+function gameOver() {
+  race = new Race();
+  race.state.level = -1;
 }
